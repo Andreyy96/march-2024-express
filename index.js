@@ -1,6 +1,6 @@
 const path = require('node:path');
 const fsPromises = require('node:fs/promises');
-const fs = require('node:fs');
+
 
 const mainFolder = path.join(__dirname, "main-folder")
 
