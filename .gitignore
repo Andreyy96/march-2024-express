@@ -2,3 +2,4 @@
 march-2024-express.iml
 node_modules
 dist
+.env
