@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import { userController } from "../controllers/user.contoller";
 import { commonMiddleware } from "../middlewares/common.middleware";
+import { userMiddleware } from "../middlewares/user.middleware";
 import { UserValidator } from "../validators/user.validator";
 
 const router = Router();
@@ -17,14 +18,14 @@ router.post(
 router.get(
   "/:userId",
   commonMiddleware.isIdValid("userId"),
-  commonMiddleware.isUserExistById,
+  userMiddleware.isUserExistById,
   userController.getById,
 );
 
 router.put(
   "/:userId",
   commonMiddleware.isIdValid("userId"),
-  commonMiddleware.isUserExistById,
+  userMiddleware.isUserExistById,
   commonMiddleware.isBodyValid(UserValidator.schemaFoUpdateUser),
   userController.updateById,
 );
@@ -32,7 +33,7 @@ router.put(
 router.delete(
   "/:userId",
   commonMiddleware.isIdValid("userId"),
-  commonMiddleware.isUserExistById,
+  userMiddleware.isUserExistById,
   userController.deleteById,
 );
 
