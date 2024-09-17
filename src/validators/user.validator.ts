@@ -23,7 +23,7 @@ export class UserValidator {
 
   public static schemaFoUpdateUser: Joi.ObjectSchema<Partial<IUser>> =
     Joi.object({
-      name: Joi.string().min(3).max(20).required(),
+      name: Joi.string().min(3).max(20),
       phone: Joi.string().trim(),
       age: Joi.number().min(12).max(100),
     });
