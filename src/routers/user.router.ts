@@ -17,12 +17,14 @@ router.post(
 router.get(
   "/:userId",
   commonMiddleware.isIdValid("userId"),
+  commonMiddleware.isUserExistById,
   userController.getById,
 );
 
 router.put(
   "/:userId",
   commonMiddleware.isIdValid("userId"),
+  commonMiddleware.isUserExistById,
   commonMiddleware.isBodyValid(UserValidator.schemaFoUpdateUser),
   userController.updateById,
 );
@@ -30,6 +32,7 @@ router.put(
 router.delete(
   "/:userId",
   commonMiddleware.isIdValid("userId"),
+  commonMiddleware.isUserExistById,
   userController.deleteById,
 );
 

@@ -3,6 +3,7 @@ import { ObjectSchema } from "joi";
 import { isObjectIdOrHexString } from "mongoose";
 
 import { ApiError } from "../errors/api-error";
+import { userRepository } from "../repositories/user.repository";
 
 class CommonMiddleware {
   public isIdValid(key: string) {
@@ -27,6 +28,25 @@ class CommonMiddleware {
         next(e);
       }
     };
+  }
+
+  public async isUserExistById(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const userId = req.params.userId;
+
+      const user = await userRepository.getById(userId);
+
+      if (!user) {
+        throw new ApiError("User not found", 404);
+      }
+      next();
+    } catch (e) {
+      next(e);
+    }
   }
 }
 
