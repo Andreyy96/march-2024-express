@@ -1,6 +1,8 @@
 import { Router } from "express";
 
 import { userController } from "../controllers/user.contoller";
+import { TokenTypeEnum } from "../enums/token-type.enum";
+import { authMiddleware } from "../middlewares/auth.middleware";
 import { commonMiddleware } from "../middlewares/common.middleware";
 import { userMiddleware } from "../middlewares/user.middleware";
 import { UserValidator } from "../validators/user.validator";
@@ -9,10 +11,26 @@ const router = Router();
 
 router.get("/", userController.getList);
 
-router.post(
-  "/",
-  commonMiddleware.isBodyValid(UserValidator.schemaForCreateUser),
-  userController.create,
+router.get(
+  "/me",
+  // authMiddleware.checkAccessToken,
+  authMiddleware.checkToken(TokenTypeEnum.ACCESS),
+  userController.getMe,
+);
+
+router.put(
+  "/me",
+  // authMiddleware.checkAccessToken,
+  authMiddleware.checkToken(TokenTypeEnum.ACCESS),
+  commonMiddleware.isBodyValid(UserValidator.schemaFoUpdateUser),
+  userController.updateMe,
+);
+
+router.delete(
+  "/me",
+  // authMiddleware.checkAccessToken,
+  authMiddleware.checkToken(TokenTypeEnum.ACCESS),
+  userController.deleteMe,
 );
 
 router.get(
@@ -20,21 +38,6 @@ router.get(
   commonMiddleware.isIdValid("userId"),
   userMiddleware.isUserExistById,
   userController.getById,
-);
-
-router.put(
-  "/:userId",
-  commonMiddleware.isIdValid("userId"),
-  userMiddleware.isUserExistById,
-  commonMiddleware.isBodyValid(UserValidator.schemaFoUpdateUser),
-  userController.updateById,
-);
-
-router.delete(
-  "/:userId",
-  commonMiddleware.isIdValid("userId"),
-  userMiddleware.isUserExistById,
-  userController.deleteById,
 );
 
 export const userRouter = router;
