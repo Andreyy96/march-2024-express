@@ -17,7 +17,7 @@ class UserService {
 
   public async deleteMe(userId: string): Promise<void> {
     await userRepository.deleteById(userId);
-    await tokenRepository.deleteByUserId(userId);
+    await tokenRepository.deleteManyByUserId(userId);
   }
 }
 

@@ -90,6 +90,10 @@ class AuthMiddleware {
         }
 
         req.res.locals.jwtPayload = payload;
+
+        if (TokenTypeEnum.REFRESH) {
+          req.res.locals.refreshToken = token;
+        }
         next();
       } catch (e) {
         next(e);

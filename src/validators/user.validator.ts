@@ -19,6 +19,7 @@ export class UserValidator {
         .trim()
         .required(),
       age: Joi.number().min(12).max(100),
+      deviceId: Joi.string().required(),
     });
 
   public static schemaFoUpdateUser: Joi.ObjectSchema<Partial<IUser>> =
@@ -41,5 +42,6 @@ export class UserValidator {
         )
         .trim()
         .required(),
+      deviceId: Joi.string().required(),
     });
 }

@@ -21,9 +21,20 @@ router.post(
 
 router.post(
   "/refresh",
-  // authMiddleware.checkRefreshToken,
   authMiddleware.checkToken(TokenTypeEnum.REFRESH),
   authController.refresh,
+);
+
+router.delete(
+  "/logout",
+  authMiddleware.checkToken(TokenTypeEnum.ACCESS),
+  authController.logOut,
+);
+
+router.delete(
+  "/full-logout",
+  authMiddleware.checkToken(TokenTypeEnum.ACCESS),
+  authController.fullLogOut,
 );
 
 export const authRouter = router;

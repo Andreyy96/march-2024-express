@@ -14,4 +14,19 @@ export interface IUser {
   updatedAt?: Date;
 }
 
-export type ISignIn = Pick<IUser, "email" | "password">;
+export interface ISignUp {
+  name: string;
+  email: string;
+  password: string;
+  age: number;
+  phone?: string;
+  deviceId: string;
+}
+
+export interface ISignIn {
+  email: string;
+  password: string;
+  deviceId: string;
+}
+
+// export type ISignIn = Pick<IUser, "email" | "password">;
