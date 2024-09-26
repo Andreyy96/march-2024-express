@@ -2,7 +2,6 @@ import { configs } from "../config/configs";
 import { ActionTokenTypeEnum } from "../enums/action-token-type.enum";
 import { EmailTypeEnum } from "../enums/email-type.enum";
 import { ApiError } from "../errors/api-error";
-import { IActionTokenPayload } from "../interfaces/actionToken.interface";
 import { ITokenPair, ITokenPayload } from "../interfaces/token.interface";
 import {
   IResetPasswordSend,
@@ -45,7 +44,7 @@ class AuthService {
     });
 
     const actionToken = tokenService.generateActionTokens(
-      { userId: user._id, role: user.role },
+      { userId: user._id, deviceId: dto.deviceId, role: user.role },
       ActionTokenTypeEnum.VERIFY,
     );
 
@@ -149,7 +148,7 @@ class AuthService {
     }
 
     const token = tokenService.generateActionTokens(
-      { userId: user._id, role: user.role },
+      { userId: user._id, deviceId: dto.deviceId, role: user.role },
       ActionTokenTypeEnum.FORGOT_PASSWORD,
     );
     await actionTokenRepository.create({
@@ -166,7 +165,7 @@ class AuthService {
 
   public async forgotPasswordSet(
     dto: IResetPasswordSet,
-    jwtPayload: IActionTokenPayload,
+    jwtPayload: ITokenPayload,
   ): Promise<void> {
     const password = await passwordService.hashPassword(dto.password);
     await userRepository.updateById(jwtPayload.userId, { password });
@@ -185,7 +184,7 @@ class AuthService {
     }
   }
 
-  public async verify(jwtPayload: IActionTokenPayload): Promise<void> {
+  public async verify(jwtPayload: ITokenPayload): Promise<void> {
     const user = await userRepository.getById(jwtPayload.userId);
 
     if (!user) {

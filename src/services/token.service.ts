@@ -4,7 +4,6 @@ import { configs } from "../config/configs";
 import { ActionTokenTypeEnum } from "../enums/action-token-type.enum";
 import { TokenTypeEnum } from "../enums/token-type.enum";
 import { ApiError } from "../errors/api-error";
-import { IActionTokenPayload } from "../interfaces/actionToken.interface";
 import { ITokenPair, ITokenPayload } from "../interfaces/token.interface";
 
 class TokenService {
@@ -20,7 +19,10 @@ class TokenService {
     return { accessToken, refreshToken };
   }
 
-  public verifyToken(token: string, type: TokenTypeEnum): ITokenPayload {
+  public verifyToken(
+    token: string,
+    type: TokenTypeEnum | ActionTokenTypeEnum,
+  ): ITokenPayload {
     try {
       let secret: string;
 
@@ -30,6 +32,12 @@ class TokenService {
           break;
         case TokenTypeEnum.REFRESH:
           secret = configs.JWT_REFRESH_SECRET;
+          break;
+        case ActionTokenTypeEnum.FORGOT_PASSWORD:
+          secret = configs.ACTION_FORGOT_PASSWORD_SECRET;
+          break;
+        case ActionTokenTypeEnum.VERIFY:
+          secret = configs.ACTION_VERIFY_SECRET;
           break;
         default:
           throw new ApiError("Invalid token type", 400);
@@ -43,7 +51,7 @@ class TokenService {
   }
 
   public generateActionTokens(
-    payload: IActionTokenPayload,
+    payload: ITokenPayload,
     tokenType: ActionTokenTypeEnum,
   ): string {
     let secret: string;
@@ -58,6 +66,7 @@ class TokenService {
         secret = configs.ACTION_VERIFY_SECRET;
         expiresIn = configs.ACTION_VERIFY_EXPIRATION;
         break;
+
       default:
         throw new ApiError("Invalid token type", 400);
     }
@@ -65,30 +74,30 @@ class TokenService {
     return jsonwebtoken.sign(payload, secret, { expiresIn });
   }
 
-  public verifyActionToken(
-    token: string,
-    type: ActionTokenTypeEnum,
-  ): IActionTokenPayload {
-    try {
-      let secret: string;
-
-      switch (type) {
-        case ActionTokenTypeEnum.FORGOT_PASSWORD:
-          secret = configs.ACTION_FORGOT_PASSWORD_SECRET;
-          break;
-        case ActionTokenTypeEnum.VERIFY:
-          secret = configs.ACTION_VERIFY_SECRET;
-          break;
-        default:
-          throw new ApiError("Invalid token type", 400);
-      }
-
-      return jsonwebtoken.verify(token, secret) as IActionTokenPayload;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {
-      throw new ApiError("Invalid token", 401);
-    }
-  }
+  // public verifyActionToken(
+  //   token: string,
+  //   type: ActionTokenTypeEnum,
+  // ): IActionTokenPayload {
+  //   try {
+  //     let secret: string;
+  //
+  //     switch (type) {
+  //       case ActionTokenTypeEnum.FORGOT_PASSWORD:
+  //         secret = configs.ACTION_FORGOT_PASSWORD_SECRET;
+  //         break;
+  //       case ActionTokenTypeEnum.VERIFY:
+  //         secret = configs.ACTION_VERIFY_SECRET;
+  //         break;
+  //       default:
+  //         throw new ApiError("Invalid token type", 400);
+  //     }
+  //
+  //     return jsonwebtoken.verify(token, secret) as IActionTokenPayload;
+  //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //   } catch (e) {
+  //     throw new ApiError("Invalid token", 401);
+  //   }
+  // }
 }
 
 export const tokenService = new TokenService();

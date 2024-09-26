@@ -42,6 +42,7 @@ export class UserValidator {
       .lowercase()
       .trim()
       .required(),
+    deviceId: Joi.string().required(),
   });
 
   public static setForgotPassword = Joi.object({

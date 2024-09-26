@@ -3,8 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { ActionTokenTypeEnum } from "../enums/action-token-type.enum";
 import { TokenTypeEnum } from "../enums/token-type.enum";
 import { ApiError } from "../errors/api-error";
-import { IActionTokenPayload } from "../interfaces/actionToken.interface";
-import { IToken } from "../interfaces/token.interface";
+import { IToken, ITokenPayload } from "../interfaces/token.interface";
 import { IResetPasswordSet } from "../interfaces/user.interface";
 import { actionTokenRepository } from "../repositories/action-token.repository";
 import { tokenRepository } from "../repositories/token.repository";
@@ -108,22 +107,22 @@ class AuthMiddleware {
   public checkActionToken(type: ActionTokenTypeEnum) {
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const { token } = req.body as IResetPasswordSet | { token: string };
+        const { token } = req.body as Partial<IResetPasswordSet>;
 
         if (!token) {
           throw new ApiError("Token is not provided", 401);
         }
-        let payload: IActionTokenPayload;
+        let payload: ITokenPayload;
 
         switch (type) {
           case ActionTokenTypeEnum.FORGOT_PASSWORD:
-            payload = tokenService.verifyActionToken(
+            payload = tokenService.verifyToken(
               token,
               ActionTokenTypeEnum.FORGOT_PASSWORD,
             );
             break;
           case ActionTokenTypeEnum.VERIFY:
-            payload = tokenService.verifyActionToken(
+            payload = tokenService.verifyToken(
               token,
               ActionTokenTypeEnum.VERIFY,
             );

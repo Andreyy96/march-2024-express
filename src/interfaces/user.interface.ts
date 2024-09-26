@@ -29,7 +29,7 @@ export interface ISignIn {
   deviceId: string;
 }
 
-export type IResetPasswordSend = Pick<IUser, "email">;
+export type IResetPasswordSend = Pick<IUser, "email"> & { deviceId: string };
 
 export type IResetPasswordSet = Pick<IUser, "password"> & { token: string };
 

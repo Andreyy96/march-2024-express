@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 
-import { IActionTokenPayload } from "../interfaces/actionToken.interface";
 import { ITokenPayload } from "../interfaces/token.interface";
 import {
   IResetPasswordSend,
@@ -82,7 +81,7 @@ class AuthController {
     next: NextFunction,
   ) {
     try {
-      const jwtPayload = req.res.locals.jwtPayload as IActionTokenPayload;
+      const jwtPayload = req.res.locals.jwtPayload as ITokenPayload;
       const dto = req.body as IResetPasswordSet;
 
       await authService.forgotPasswordSet(dto, jwtPayload);
@@ -94,7 +93,7 @@ class AuthController {
 
   public async verify(req: Request, res: Response, next: NextFunction) {
     try {
-      const jwtPayload = req.res.locals.jwtPayload as IActionTokenPayload;
+      const jwtPayload = req.res.locals.jwtPayload as ITokenPayload;
 
       await authService.verify(jwtPayload);
       res.sendStatus(204);
