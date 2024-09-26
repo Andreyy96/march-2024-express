@@ -5,6 +5,7 @@ dotenv.config();
 export const configs = {
   APP_PORT: process.env.APP_PORT || 3000,
   APP_HOST: process.env.APP_HOST,
+  FRONT_URL: process.env.FRONT_URL,
 
   MONGO_URI: process.env.MONGO_URI,
 
@@ -14,6 +15,12 @@ export const configs = {
   JWT_REFRESH_EXPIRATION: process.env.JWT_REFRESH_EXPIRATION,
 
   HASH_ROUNDS: process.env.HASH_ROUNDS,
+
+  ACTION_FORGOT_PASSWORD_SECRET: process.env.ACTION_FORGOT_PASSWORD_SECRET,
+  ACTION_FORGOT_PASSWORD_EXPIRATION:
+    process.env.ACTION_FORGOT_PASSWORD_EXPIRATION,
+  ACTION_VERIFY_SECRET: process.env.ACTION_VERIFY_SECRET,
+  ACTION_VERIFY_EXPIRATION: process.env.ACTION_VERIFY_EXPIRATION,
 
   SMTP_EMAIL: process.env.SMTP_EMAIL,
   SMTP_PASSWORD: process.env.SMTP_PASSWORD,

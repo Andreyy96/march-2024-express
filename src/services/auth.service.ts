@@ -1,7 +1,17 @@
+import { configs } from "../config/configs";
+import { ActionTokenTypeEnum } from "../enums/action-token-type.enum";
 import { EmailTypeEnum } from "../enums/email-type.enum";
 import { ApiError } from "../errors/api-error";
+import { IActionTokenPayload } from "../interfaces/actionToken.interface";
 import { ITokenPair, ITokenPayload } from "../interfaces/token.interface";
-import { ISignIn, ISignUp, IUser } from "../interfaces/user.interface";
+import {
+  IResetPasswordSend,
+  IResetPasswordSet,
+  ISignIn,
+  ISignUp,
+  IUser,
+} from "../interfaces/user.interface";
+import { actionTokenRepository } from "../repositories/action-token.repository";
 import { tokenRepository } from "../repositories/token.repository";
 import { userRepository } from "../repositories/user.repository";
 import { emailService } from "./email.service";
@@ -34,8 +44,21 @@ class AuthService {
       _userId: user._id,
     });
 
+    const actionToken = tokenService.generateActionTokens(
+      { userId: user._id, role: user.role },
+      ActionTokenTypeEnum.VERIFY,
+    );
+
+    await actionTokenRepository.create({
+      type: ActionTokenTypeEnum.VERIFY,
+      _userId: user._id,
+      token: actionToken,
+    });
+
     await emailService.sendMail(EmailTypeEnum.WELCOME, user.email, {
       name: user.name,
+      frontUrl: configs.FRONT_URL,
+      actionToken,
     });
 
     return { user, tokens };
@@ -118,11 +141,63 @@ class AuthService {
     });
   }
 
+  public async forgotPasswordSendEmail(dto: IResetPasswordSend): Promise<void> {
+    const user = await userRepository.getByEmail(dto.email);
+
+    if (!user) {
+      throw new ApiError("User not found", 404);
+    }
+
+    const token = tokenService.generateActionTokens(
+      { userId: user._id, role: user.role },
+      ActionTokenTypeEnum.FORGOT_PASSWORD,
+    );
+    await actionTokenRepository.create({
+      type: ActionTokenTypeEnum.FORGOT_PASSWORD,
+      _userId: user._id,
+      token,
+    });
+
+    await emailService.sendMail(EmailTypeEnum.FORGOT_PASSWORD, user.email, {
+      frontUrl: configs.FRONT_URL,
+      actionToken: token,
+    });
+  }
+
+  public async forgotPasswordSet(
+    dto: IResetPasswordSet,
+    jwtPayload: IActionTokenPayload,
+  ): Promise<void> {
+    const password = await passwordService.hashPassword(dto.password);
+    await userRepository.updateById(jwtPayload.userId, { password });
+
+    await actionTokenRepository.deleteManyByParams({
+      _userId: jwtPayload.userId,
+      type: ActionTokenTypeEnum.FORGOT_PASSWORD,
+    });
+    await tokenRepository.deleteManyByUserId(jwtPayload.userId);
+  }
+
   private async isEmailExistOrThrow(email: string): Promise<void> {
     const user = await userRepository.getByEmail(email);
     if (user) {
       throw new ApiError("Email already exists", 409);
     }
+  }
+
+  public async verify(jwtPayload: IActionTokenPayload): Promise<void> {
+    const user = await userRepository.getById(jwtPayload.userId);
+
+    if (!user) {
+      throw new ApiError("User not found", 404);
+    }
+
+    await actionTokenRepository.deleteManyByParams({
+      _userId: jwtPayload.userId,
+      type: ActionTokenTypeEnum.VERIFY,
+    });
+
+    await userRepository.updateById(jwtPayload.userId, { isVerified: true });
   }
 }
 

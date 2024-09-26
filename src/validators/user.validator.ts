@@ -1,5 +1,6 @@
 import Joi from "joi";
 
+import { regexConstant } from "../constants/regex.constant";
 import { IUser } from "../interfaces/user.interface";
 
 export class UserValidator {
@@ -7,17 +8,12 @@ export class UserValidator {
     Joi.object({
       name: Joi.string().min(3).max(20).trim().required(),
       email: Joi.string()
-        .regex(/^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/)
+        .regex(regexConstant.EMAIL)
         .lowercase()
         .trim()
         .required(),
-      phone: Joi.string(),
-      password: Joi.string()
-        .regex(
-          /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$_!%*#?&]{5,}$/,
-        )
-        .trim()
-        .required(),
+      phone: Joi.string().regex(regexConstant.PHONE),
+      password: Joi.string().regex(regexConstant.PASSWORD).trim().required(),
       age: Joi.number().min(12).max(100),
       deviceId: Joi.string().required(),
     });
@@ -32,16 +28,24 @@ export class UserValidator {
   public static schemaForLoginUser: Joi.ObjectSchema<Partial<IUser>> =
     Joi.object({
       email: Joi.string()
-        .regex(/^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/)
+        .regex(regexConstant.EMAIL)
         .lowercase()
         .trim()
         .required(),
-      password: Joi.string()
-        .regex(
-          /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$_!%*#?&]{5,}$/,
-        )
-        .trim()
-        .required(),
+      password: Joi.string().regex(regexConstant.PASSWORD).trim().required(),
       deviceId: Joi.string().required(),
     });
+
+  public static forgotPassword = Joi.object({
+    email: Joi.string()
+      .regex(regexConstant.EMAIL)
+      .lowercase()
+      .trim()
+      .required(),
+  });
+
+  public static setForgotPassword = Joi.object({
+    password: Joi.string().regex(regexConstant.PASSWORD).trim().required(),
+    token: Joi.string().required(),
+  });
 }
