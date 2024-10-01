@@ -4,6 +4,7 @@ import { EmailTypeEnum } from "../enums/email-type.enum";
 import { ApiError } from "../errors/api-error";
 import { ITokenPair, ITokenPayload } from "../interfaces/token.interface";
 import {
+  IChangePassword,
   IResetPasswordSend,
   IResetPasswordSet,
   ISignIn,
@@ -11,6 +12,7 @@ import {
   IUser,
 } from "../interfaces/user.interface";
 import { actionTokenRepository } from "../repositories/action-token.repository";
+import { oldPasswordRepository } from "../repositories/old-password.repository";
 import { tokenRepository } from "../repositories/token.repository";
 import { userRepository } from "../repositories/user.repository";
 import { emailService } from "./email.service";
@@ -197,6 +199,34 @@ class AuthService {
     });
 
     await userRepository.updateById(jwtPayload.userId, { isVerified: true });
+  }
+
+  public async changePassword(
+    jwtPayload: ITokenPayload,
+    dto: IChangePassword,
+  ): Promise<void> {
+    const user = await userRepository.getById(jwtPayload.userId);
+
+    const isPasswordCorrect = await passwordService.comparePassword(
+      dto.oldPassword,
+      user.password,
+    );
+
+    if (!isPasswordCorrect) {
+      throw new ApiError("Invalid previous password", 401);
+    }
+
+    await passwordService.checkOldPassword(dto.password, user._id);
+
+    const password = await passwordService.hashPassword(dto.password);
+
+    await oldPasswordRepository.create({
+      password: user.password,
+      _userId: user._id,
+    });
+
+    await userRepository.updateById(jwtPayload.userId, { password });
+    await tokenRepository.deleteManyByUserId(jwtPayload.userId);
   }
 }
 

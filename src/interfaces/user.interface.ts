@@ -1,4 +1,5 @@
 import { RoleEnum } from "../enums/role.enum";
+import { IToken } from "./token.interface";
 
 export interface IUser {
   _id?: string;
@@ -29,8 +30,14 @@ export interface ISignIn {
   deviceId: string;
 }
 
+export interface IAggregateUser extends IUser {
+  tokens: IToken[];
+}
+
 export type IResetPasswordSend = Pick<IUser, "email"> & { deviceId: string };
 
 export type IResetPasswordSet = Pick<IUser, "password"> & { token: string };
+
+export type IChangePassword = Pick<IUser, "password"> & { oldPassword: string };
 
 // export type ISignIn = Pick<IUser, "email" | "password">;

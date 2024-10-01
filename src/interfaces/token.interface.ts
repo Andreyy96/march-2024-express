@@ -6,6 +6,8 @@ export interface IToken {
   refreshToken: string;
   _userId: string;
   deviceId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ITokenPayload {

@@ -1,4 +1,4 @@
-import { IUser } from "../interfaces/user.interface";
+import { IAggregateUser, IUser } from "../interfaces/user.interface";
 import { User } from "../models/user.model";
 
 class UserRepository {
@@ -11,7 +11,7 @@ class UserRepository {
   }
 
   public async getById(userId: string): Promise<IUser | null> {
-    return await User.findById(userId);
+    return await User.findById(userId).select("+password");
   }
 
   public async getByEmail(email: string): Promise<IUser | null> {
@@ -24,6 +24,22 @@ class UserRepository {
 
   public async deleteById(userId: string): Promise<void> {
     await User.findByIdAndDelete(userId);
+  }
+
+  public async getOldVisiters(date: Date): Promise<IAggregateUser[]> {
+    return await User.aggregate([
+      {
+        $lookup: {
+          from: "tokens",
+          let: { userId: "$_id" },
+          as: "tokens",
+          pipeline: [
+            { $match: { $expr: { $eq: ["$_userId", "$$userId"] } } },
+            { $match: { createdAt: { $gt: date } } },
+          ],
+        },
+      },
+    ]);
   }
 }
 
