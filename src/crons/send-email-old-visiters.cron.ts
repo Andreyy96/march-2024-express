@@ -10,9 +10,8 @@ const handler = async () => {
   try {
     const date = timeHelper.subtractByParams(10, "days");
     const users = await userRepository.getOldVisiters(date);
-    const mapUsers = users.filter((user) => user.tokens.length <= 0);
 
-    for (const user of mapUsers) {
+    for (const user of users) {
       await emailService.sendMail(EmailTypeEnum.OLD_VISIT, user.email, {
         frontUrl: configs.FRONT_URL,
         name: user.name,
