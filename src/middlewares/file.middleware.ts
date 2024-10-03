@@ -24,7 +24,7 @@ class FileMiddleware {
           throw new ApiError("Empty file", 400);
         }
 
-        if (Array.isArray(avatar) && !FileItemTypeEnum.USER) {
+        if (Array.isArray(avatar) && FileItemTypeEnum.USER) {
           throw new ApiError("Single file", 400);
         }
 
