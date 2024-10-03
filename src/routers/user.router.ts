@@ -1,9 +1,11 @@
 import { Router } from "express";
 
 import { userController } from "../controllers/user.contoller";
+import { FileItemTypeEnum } from "../enums/file-item-type.enum";
 import { TokenTypeEnum } from "../enums/token-type.enum";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { commonMiddleware } from "../middlewares/common.middleware";
+import { fileMiddleware } from "../middlewares/file.middleware";
 import { userMiddleware } from "../middlewares/user.middleware";
 import { UserValidator } from "../validators/user.validator";
 
@@ -31,6 +33,19 @@ router.delete(
   // authMiddleware.checkAccessToken,
   authMiddleware.checkToken(TokenTypeEnum.ACCESS),
   userController.deleteMe,
+);
+
+router.post(
+  "/me/avatar",
+  authMiddleware.checkToken(TokenTypeEnum.ACCESS),
+  fileMiddleware.isFileValid(FileItemTypeEnum.USER),
+  userController.uploadAvatar,
+);
+
+router.delete(
+  "/me/avatar",
+  authMiddleware.checkToken(TokenTypeEnum.ACCESS),
+  userController.deleteAvatar,
 );
 
 router.get(

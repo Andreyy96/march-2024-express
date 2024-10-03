@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from "express";
+import { UploadedFile } from "express-fileupload";
 
 import { ITokenPayload } from "../interfaces/token.interface";
 import { IUser } from "../interfaces/user.interface";
+import { userPresenter } from "../presenters/user.presenter";
 import { userService } from "../services/user.service";
 
 class UserController {
@@ -49,6 +51,31 @@ class UserController {
     try {
       const jwtPayload = req.res.locals.jwtPayload as ITokenPayload;
       await userService.deleteMe(jwtPayload.userId);
+      res.sendStatus(204);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async uploadAvatar(req: Request, res: Response, next: NextFunction) {
+    try {
+      const jwtPayload = req.res.locals.jwtPayload as ITokenPayload;
+      const avatar = req.files.avatar as UploadedFile;
+
+      const user = await userService.uploadAvatar(jwtPayload, avatar);
+      const result = userPresenter.toPublicResDto(user);
+      res.status(201).json(result);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async deleteAvatar(req: Request, res: Response, next: NextFunction) {
+    try {
+      const jwtPayload = req.res.locals.jwtPayload as ITokenPayload;
+
+      await userService.deleteAvatar(jwtPayload);
+
       res.sendStatus(204);
     } catch (e) {
       next(e);
