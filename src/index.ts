@@ -1,7 +1,9 @@
 import express, { NextFunction, Request, Response } from "express";
 import fileUpload from "express-fileupload";
 import * as mongoose from "mongoose";
+import swaggerUi from "swagger-ui-express";
 
+import swaggerDocument from "../docs/swagger.json";
 import { configs } from "./config/configs";
 import { cronRunner } from "./crons";
 import { ApiError } from "./errors/api-error";
@@ -13,6 +15,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use("/users", userRouter);
 app.use("/auth", authRouter);
@@ -35,4 +38,5 @@ app.listen(configs.APP_PORT, async () => {
   console.log(
     `Server is running on http://${configs.APP_HOST}:${configs.APP_PORT}`,
   );
+  console.log(`Swagger  http://${configs.APP_HOST}:${configs.APP_PORT}/docs`);
 });

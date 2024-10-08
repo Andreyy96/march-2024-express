@@ -56,11 +56,11 @@ class AuthService {
       token: actionToken,
     });
 
-    await emailService.sendMail(EmailTypeEnum.WELCOME, user.email, {
-      name: user.name,
-      frontUrl: configs.FRONT_URL,
-      actionToken,
-    });
+    // await emailService.sendMail(EmailTypeEnum.WELCOME, user.email, {
+    //   name: user.name,
+    //   frontUrl: configs.FRONT_URL,
+    //   actionToken,
+    // });
 
     return { user, tokens };
   }

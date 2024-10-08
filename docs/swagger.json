@@ -1,0 +1,433 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This api is for testing the swagger ui",
+    "version": "1.0.7",
+    "title": "Express API",
+    "contact": {
+      "email": "test@gmail.com"
+    }
+  },
+  "host": "localhost:3000",
+  "tags": [
+    {
+      "name": "user",
+      "description": "Operations about user"
+    },
+    {
+      "name": "auth",
+      "description": "Operations about auth"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/users/me": {
+      "get": {
+        "tags": ["user"],
+        "summary": "Get me",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "getMyUser",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/PrivateUserResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["user"],
+        "summary": "Update me",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "updateMyUser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateUserDTO"
+
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/PrivateUserResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid user supplied"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Delete user",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "deleteUser",
+        "security": [{"jwt_token": []}],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "The name that needs to be deleted",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/PrivateUserResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid username supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/auth/sign-up": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Create user",
+        "operationId": "createUser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Created user object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SignUpDTO"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          },
+          "209": {
+            "description": "Email is already"
+          },
+          "400": {
+            "description": "Invalid body"
+          }
+        }
+      }
+    },
+    "/auth/sign-in": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Login user",
+        "operationId": "loginUser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Login user",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SignInDTO"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid body"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "delete": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Logout user",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "logoutUser",
+        "consumes": [
+          "application/json"
+        ],
+        "security": [{"jwt_token": []}],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid body"
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Refresh tokens",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "refreshTokens",
+        "consumes": [
+          "application/json"
+        ],
+        "security": [{"jwt_token": []}],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/TokensResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid body"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "jwt_token": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "definitions": {
+    "UpdateUserDTO": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Updated name in the system",
+          "type": "string"
+        },
+        "phone": {
+          "description": "Updated phone number in the system",
+          "type": "string"
+        },
+        "age": {
+          "description": "Age in years",
+          "type": "number"
+        }
+      }
+    },
+    "PrivateUserResponse": {
+      "type": "object",
+      "required": ["_id", "name", "email", "role", "isDeleted", "isVerified"],
+      "properties": {
+        "_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for a user"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "age": {
+          "type": "number"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "user"]
+        },
+        "isDeleted": {
+          "type": "boolean"
+        },
+        "isVerified": {
+          "type": "boolean"
+        }
+      }
+    },
+    "UserResponse": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for a user"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "age": {
+          "type": "number"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "admin",
+            "user"
+          ]
+        },
+        "isDeleted": {
+          "type": "boolean"
+        },
+        "isVerified": {
+          "type": "boolean"
+        },
+        "tokens": {
+          "type": "object",
+          "properties": {
+            "accessToken": {
+              "type": "string"
+            },
+            "refreshToken": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "SignUpDTO": {
+      "type": "object",
+      "required": ["name", "email", "password", "deviceId"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "age": {
+          "type": "number"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "deviceId": {
+          "type": "string"
+        }
+      }
+    },
+    "SignInDTO": {
+      "type": "object",
+      "required": ["email", "password", "deviceId"],
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "deviceId": {
+          "type": "string"
+        }
+      }
+    },
+    "TokensResponse": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
